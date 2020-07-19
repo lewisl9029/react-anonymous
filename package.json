@@ -1,0 +1,15 @@
+{
+  "name": "@lewisl9029/render-hooks",
+  "version": "1.0.0",
+  "description": "Use hooks anywhere in your component tree",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
+  "type": "module",
+  "repository": "https://github.com/lewisl9029/render-hooks.git",
+  "author": "Lewis Liu <lewisl9029@users.noreply.github.com>",
+  "license": "MIT",
+  "private": false,
+  "peerDependencies": {
+    "react": "^16.8.0"
+  }
+}
