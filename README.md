@@ -1,32 +1,26 @@
 # render-hooks
 
 ```js
-const example = () => (
-  <RenderState args={[false]}>
-    {(isOpen, setIsOpen) =>
-      isOpen ? (
-        <RenderCallback args={[() => setIsOpen(false), [setIsOpen]]}>
-          {(close) => <Modal close={close}>Blah</Modal>}
-        </RenderCallback>
-      ) : null
-    }
-  </RenderState>
-)
+import * as React from 'react'
+import Hooks from '@lewisl9029/render-hooks'
 
-const example2 = () => (
-  <RenderHooks
-    hooks={() => {
-      const [isOpen, setIsOpen] = React.useState(false)
-      const close = React.useCallback(() => setIsOpen(false), [setIsOpen])
+const Example = () => {
+  const [isOpen, setIsOpen] = React.useState(false)
 
-      React.useEffect(() => {
-        setIsOpen(true)
-      }, [setIsOpen])
-
-      return { isOpen, close }
-    }}
-  >
-    {({ isOpen, close }) => (isOpen ? <Modal close={close}>Blah</Modal> : null)}
-  </RenderHooks>
-)
+  React.useEffect(() => {
+    setIsOpen(true)
+  }, [setIsOpen])
+      
+  return (
+    <div>
+      {isOpen ? 
+        // use hooks anywhere in the tree, without introducing another component
+        <Hooks>
+          {() => <Modal close={React.useCallback(() => setIsOpen(false), [setIsOpen])}>Blah</Modal>}
+        </Hooks> : 
+        null
+      }
+    </div>
+  )
+}
 ```
