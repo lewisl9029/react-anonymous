@@ -16,7 +16,13 @@ const Example = () => {
       {isOpen ? 
         // use hooks anywhere in the tree, without introducing another component
         <Hooks>
-          {() => <Modal close={React.useCallback(() => setIsOpen(false), [setIsOpen])}>Blah</Modal>}
+          {() => (
+            <Modal 
+              close={React.useCallback(() => setIsOpen(false), [setIsOpen])}
+            >
+              Blah
+            </Modal>
+          )}
         </Hooks> : 
         null
       }
