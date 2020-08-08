@@ -1,6 +1,6 @@
 {
   "name": "@lewisl9029/render-hooks",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Use hooks anywhere in your component tree",
   "main": "src/index.js",
   "types": "src/index.d.ts",
