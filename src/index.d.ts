@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-type Children = () => React.ReactNode
+type Children = () => React.ReactElement
 
 export const Hooks: (props: {
   children: Children
