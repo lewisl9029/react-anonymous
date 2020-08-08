@@ -1,6 +1,9 @@
 # render-hooks
 
+Use hooks anywhere in your render tree.
+
 ## Motivation
+
 By now I'm sure we're all deeply familiar with the infamous Rules of Hooks:
 
 > Don’t call Hooks inside loops, conditions, or nested functions. 
