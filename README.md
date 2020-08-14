@@ -206,7 +206,7 @@ Now we can go back to adding indirection only when we feel it's useful, instead 
 
 If you're using [eslint-plugin-react-hooks](https://www.npmjs.com/package/eslint-plugin-react-hooks), you'll get errors when trying to use `render-hooks` due to the plugin not recognizing that `Hooks` can be treated as a valid component boundary.
 
-I've created a fork of the plugin at https://www.npmjs.com/package/@lewisl9029/render-hooks to add support for this pattern. The changes are [very naive](https://github.com/facebook/react/commit/48932399adc47a3defc27f3edbbf5da92050d3d0) however, so I do anticipate plenty of edge cases. Please feel free to report any issues you find with the plugin here.
+I've created a fork of the plugin at https://www.npmjs.com/package/@lewisl9029/eslint-plugin-react-hooks to add support for this pattern. The changes are [very naive](https://github.com/facebook/react/commit/48932399adc47a3defc27f3edbbf5da92050d3d0) however, so I do anticipate plenty of edge cases. Please feel free to report any issues you find with the plugin here.
 
 ## How it works
 
