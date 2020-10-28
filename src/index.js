@@ -1,3 +1,6 @@
-export const Hooks = ({ children }) => children()
+import * as React from 'react'
 
-export default Hooks
+export const Hooks = ({ children }) => children()
+export const hooks = (children) => React.createElement(Hooks, { children })
+
+export default hooks
