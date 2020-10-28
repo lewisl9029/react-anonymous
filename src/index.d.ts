@@ -1,9 +1,11 @@
 import * as React from 'react'
 
-type Children = () => React.ReactElement
+type RenderFunction = () => React.ReactElement
 
 export const Hooks: (props: {
-  children: Children
-}) => ReturnType<Children>
+  children: RenderFunction
+}) => ReturnType<RenderFunction>
 
-export = Hooks
+export const hooks: (children: RenderFunction) => ReturnType<RenderFunction>
+
+export = hooks
