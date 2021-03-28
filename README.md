@@ -1,4 +1,4 @@
-# react-boundary
+# component-boundary
 
 Use hooks anywhere in your render tree by wrapping your elements in a `boundary` function.
 
