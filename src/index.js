@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-export const Hooks = ({ children }) => children()
-export const hooks = (children) => React.createElement(Hooks, { children })
+export const Boundary = ({ children }) => children()
+export const boundary = (children) => React.createElement(Boundary, { children })
 
-export default hooks
+export default boundary

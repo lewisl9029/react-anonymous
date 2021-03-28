@@ -1,12 +1,12 @@
-# render-hooks
+# react-boundary
 
-Use hooks anywhere in your render tree by wrapping your components in a `hooks` function.
+Use hooks anywhere in your render tree by wrapping your elements in a `boundary` function.
 
 See the example below for some use cases where this might be helpful:
 
 ```js
 import * as React from "react";
-import hooks from "@lewisl9029/render-hooks";
+import boundary from "@lewisl9029/component-boundary";
 
 const Example = ({ colors }) => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -15,14 +15,14 @@ const Example = ({ colors }) => {
     <div>
       {isOpen
         ? // Ever wanted to to call a hook within a branching path?
-          hooks(() => (
+          boundary(() => (
             <Modal
               close={React.useCallback(() => setIsOpen(false), [setIsOpen])}
             >
               <ul>
                 {colors.map((color) =>
                   // Or within a mapping function?
-                  hooks(() => (
+                  boundary(() => (
                     <li style={useMemo(() => ({ color }), [color])}>{color}</li>
                   ))
                 )}
@@ -88,25 +88,25 @@ Some readers may point out that they _prefer_ the latter version to the earlier 
 
 That's a perfectly valid position to take, but I'd like to remind those readers that the decision on whether or not to add any layer of indirection should reflect a value judgement on whether or not we feel the indirection is actually useful (inherently subjective and should be made on case-by-case basis), not forced upon us by some arbitrary implementation detail of the library we're using.
 
-This is where `render-hooks` comes in.
+This is where `component-boundary` comes in.
 
 ## Installation
 
 ```js
-npm i @lewisl9029/render-hooks
+npm i @lewisl9029/component-boundary
 ```
 
 or
 
 ```
-yarn add @lewisl9029/render-hooks
+yarn add @lewisl9029/component-boundary
 ```
 
 ## Usage
 
 ```js
 import * as React from "react";
-import hooks from "@lewisl9029/render-hooks";
+import boundary from "@lewisl9029/component-boundary";
 
 const Example = () => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -114,8 +114,8 @@ const Example = () => {
   return (
     <div>
       {isOpen
-        ? // use hooks anywhere in the tree, without introducing another component
-          hooks(() => (
+        ? // call boundary anywhere in the tree, without introducing a separate component
+          boundary(() => (
             <Modal
               close={React.useCallback(() => setIsOpen(false), [setIsOpen])}
             >
@@ -128,19 +128,19 @@ const Example = () => {
 };
 ```
 
-The `hooks` function from `render-hooks` acts as a component boundary for all of your hook calls. You can add it anywhere inside the render tree to call hooks in a way that would otherwise have violated the rules of hooks, without adding any additional layers of indirection.
+The `boundary` function from `component-boundary` acts as a component boundary for all of your hook calls. You can add it anywhere inside the render tree to call hooks in a way that would otherwise have violated the rules of hooks, without adding any additional layers of indirection.
 
 Note that it also works great for looping:
 
 ```js
 import * as React from "react";
-import hooks from "@lewisl9029/render-hooks";
+import boundary from "@lewisl9029/component-boundary";
 
 const Example = ({ colors }) => {
   return (
     <ul>
       {colors.map((color) =>
-        hooks(() => (
+        boundary(() => (
           <li style={useMemo(() => ({ color }), [color])}>{color}</li>
         ))
       )}
@@ -149,11 +149,11 @@ const Example = ({ colors }) => {
 };
 ```
 
-However, keep in mind that you still have to obey the rules of hooks within the `hooks` function:
+However, keep in mind that you still have to obey the rules of hooks within the `boundary` function:
 
 ```js
 import * as React from "react";
-import hooks from "@lewisl9029/render-hooks";
+import boundary from "@lewisl9029/component-boundary";
 
 const Example = ({ colors }) => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -161,7 +161,7 @@ const Example = ({ colors }) => {
   return (
     <div>
       {isOpen
-        ? hooks(() => (
+        ? boundary(() => (
             <Modal
               close={React.useCallback(() => setIsOpen(false), [setIsOpen])}
             >
@@ -179,11 +179,11 @@ const Example = ({ colors }) => {
 };
 ```
 
-We can, however, nest additional layers of the `hooks` function to arbitrary depths to work around this:
+We can, however, nest additional layers of the `boundary` function to arbitrary depths to work around this:
 
 ```js
 import * as React from "react";
-import hooks from "@lewisl9029/render-hooks";
+import boundary from "@lewisl9029/component-boundary";
 
 const Example = ({ colors }) => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -191,14 +191,14 @@ const Example = ({ colors }) => {
   return (
     <div>
       {isOpen
-        ? hooks(() => (
+        ? boundary(() => (
             <Modal
               close={React.useCallback(() => setIsOpen(false), [setIsOpen])}
             >
               <ul>
                 {colors.map((color) =>
                   // All good now
-                  hooks(() => (
+                  boundary(() => (
                     <li style={useMemo(() => ({ color }), [color])}>{color}</li>
                   ))
                 )}
@@ -217,7 +217,7 @@ Now we can go back to adding indirection only when we feel it's useful, instead 
 
 ## Linting
 
-If you're using [eslint-plugin-react-hooks](https://www.npmjs.com/package/eslint-plugin-react-hooks), you'll get errors when trying to use `render-hooks` due to the plugin not recognizing that `hooks` can be treated as a valid component boundary.
+If you're using [eslint-plugin-react-hooks](https://www.npmjs.com/package/eslint-plugin-react-hooks), you'll get errors when trying to use `component-boundary` due to the plugin not recognizing that `boundary` can be treated as a valid component boundary.
 
 I've created a fork of the plugin at https://www.npmjs.com/package/@lewisl9029/eslint-plugin-react-hooks to add support for this pattern. The changes are [very naive](https://github.com/lewisl9029/react/pull/1/files) however, so I do anticipate plenty of edge cases. Please feel free to report any issues you find with the plugin here.
 
@@ -226,59 +226,12 @@ I've created a fork of the plugin at https://www.npmjs.com/package/@lewisl9029/e
 The implementation is literally 2 lines:
 
 ```js
-export const Hooks = ({ children }) => children();
-export const hooks = (children) => React.createElement(Hooks, { children });
+export const Boundary = ({ children }) => children();
+export const boundary = (children) => React.createElement(Boundary, { children });
 ```
 
 By packaging it as a library I'm mostly trying to promote the pattern and make it easier to get people started using it. Feel free to simply copy paste this into your project and use it directly, replacing the eslint plugin with my fork from above. I hope to eventually document this pattern in an RFC so we can get official support for it in the linting rule without having to maintain a fork.
 
-## Alternative API
-
-Before v2, we provided a `Hooks` component as the default export that can be used like this:
-
-```js
-import * as React from 'react'
-import Hooks from '@lewisl9029/render-hooks'
-
-const Example = ({ colors }) => {
-  const [isOpen, setIsOpen] = React.useState(false)
-      
-  return (
-    <div>
-      {isOpen ? 
-        <Hooks>
-          {() => (
-            <Modal 
-              close={React.useCallback(() => setIsOpen(false), [setIsOpen])}
-            >
-              <ul>
-                {colors.map((color) => 
-                  // All good now
-                  <Hooks>
-                    {() => <li style={useMemo(() => ({ color }), [color])}>{color}</li>}
-                  </Hooks>
-                )}
-              </ul>
-            </Modal>
-          )}
-        </Hooks> : 
-        null
-      }
-    </div>
-  )
-}
-```
-
-Since v2, the default export has been changed to the newly introduced `hooks` function, which ends up being a lot more ergonomic to use due to the much simpler syntax and lower levels of indentation.
-
-However, we do still provide the `Hooks` component as a named export for backwards compatibility, and for anyone who happens to prefer the old API. Simply change your import statement to:
-
-```js
-import { Hooks } from '@lewisl9029/render-hooks'
-```
-
-The linting rule fork will continue to support both variants.
-
 ## License
 
-[MIT](https://github.com/lewisl9029/render-hooks/blob/master/src/LICENSE.txt)
+[MIT](https://github.com/lewisl9029/component-boundary/blob/master/src/LICENSE.txt)
