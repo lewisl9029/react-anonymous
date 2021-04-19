@@ -1,6 +1,6 @@
 import * as React from 'react'
 
 export const Boundary = ({ children }) => children()
-export const boundary = (children) => React.createElement(Boundary, { children })
+export const anonymous = (children, { key } = {}) => React.createElement(Boundary, { children, key })
 
-export default boundary
+export default anonymous

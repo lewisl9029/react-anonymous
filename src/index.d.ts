@@ -2,10 +2,10 @@ import * as React from 'react'
 
 type RenderFunction = () => React.ReactElement
 
-export const Boundary: (props: {
+export const Anonymous: (props: {
   children: RenderFunction
 }) => ReturnType<RenderFunction>
 
-export const boundary: (children: RenderFunction) => ReturnType<RenderFunction>
+export const anonymous: (children: RenderFunction, options?: { key?: string }) => ReturnType<RenderFunction>
 
-export = boundary
+export = anonymous

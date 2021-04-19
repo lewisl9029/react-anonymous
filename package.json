@@ -1,22 +1,24 @@
 {
-  "name": "@lewisl9029/component-boundary",
-  "version": "3.0.2",
+  "name": "@lewisl9029/react-anonymous",
+  "version": "4.0.0",
   "keywords": [
     "react",
     "hooks",
+    "anonymous",
+    "anonymous-component",
     "component-boundary",
     "render-hooks",
     "rules-of-hooks"
   ],
-  "description": "Use hooks anywhere in your render tree",
+  "description": "Create anonymous components to use hooks anywhere in your render tree",
   "main": "src/index.js",
   "types": "src/index.d.ts",
   "type": "module",
-  "repository": "https://github.com/lewisl9029/component-boundary.git",
+  "repository": "https://github.com/lewisl9029/react-anonymous.git",
   "author": "Lewis Liu <lewisl9029@users.noreply.github.com>",
   "license": "MIT",
   "private": false,
   "peerDependencies": {
-    "react": "^17.0.2"
+    "react": ">16.8.0"
   }
 }
