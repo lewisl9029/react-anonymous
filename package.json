@@ -1,16 +1,14 @@
 {
   "name": "@lewisl9029/react-anonymous",
-  "version": "4.0.1",
+  "version": "5.0.0",
   "keywords": [
     "react",
     "hooks",
     "anonymous",
     "anonymous-component",
-    "component-boundary",
-    "render-hooks",
     "rules-of-hooks"
   ],
-  "description": "Create anonymous components to use hooks anywhere in your render tree",
+  "description": "Rules of hooks made less painful. Use hooks anywhere in your render tree by rendering an `Anonymous` component.",
   "main": "src/index.js",
   "types": "src/index.d.ts",
   "type": "module",
@@ -20,5 +18,8 @@
   "private": false,
   "peerDependencies": {
     "react": ">16.8.0"
+  },
+  "optionalDependencies": {
+    "@lewisl9029/eslint-plugin-react-hooks-for-react-anonymous": "0.0.1"
   }
 }

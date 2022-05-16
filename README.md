@@ -1,12 +1,12 @@
 # react-anonymous
 
-Use hooks anywhere in your render tree by wrapping your elements in an `anonymous` component.
+Rules of hooks made less painful. Use hooks anywhere in your render tree by rendering an `Anonymous` component. 
 
 See the example below for some use cases where this might be helpful:
 
 ```js
 import * as React from "react";
-import anonymous from "@lewisl9029/react-anonymous";
+import Anonymous from "@lewisl9029/react-anonymous";
 
 const Example = ({ colors }) => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -14,21 +14,25 @@ const Example = ({ colors }) => {
   return (
     <div>
       {isOpen
-        ? // Ever wanted to to call a hook within a branching path?
-          anonymous(() => (
-            <Modal
-              close={React.useCallback(() => setIsOpen(false), [setIsOpen])}
-            >
-              <ul>
-                {colors.map((color) =>
-                  // Or within a mapping function?
-                  anonymous(() => (
-                    <li style={useMemo(() => ({ color }), [color])}>{color}</li>
-                  ))
-                )}
-              </ul>
-            </Modal>
-          ))
+        ? // Ever wanted to call a hook within a branching path?
+          <Anonymous key="true">
+            {() => (
+              <Modal
+                close={React.useCallback(() => setIsOpen(false), [setIsOpen])}
+              >
+                <ul>
+                  {colors.map((color) =>
+                    // Or within a mapping function?
+                    <Anonymous key={color}>
+                      {() => (
+                        <li style={useMemo(() => ({ color }), [color])}>{color}</li>
+                      )}
+                    </Anonymous>
+                  )}
+                </ul>
+              </Modal>
+            )}
+          </Anonymous>
         : null}
     </div>
   );
@@ -36,6 +40,10 @@ const Example = ({ colors }) => {
 ```
 
 ## Motivation
+
+> I documented the motivation and use cases in much more detail in the following RFC: https://github.com/reactjs/rfcs/pull/197
+> 
+> Unfortunately it was declined, but I hope if we eventually demonstrate enough demand in userland, the React team could start reconsidering this and other solutions to the poor usage ergonomics caused by rules of hooks.
 
 By now I'm sure we're all deeply familiar with the infamous Rules of Hooks:
 
@@ -106,7 +114,7 @@ yarn add @lewisl9029/react-anonymous
 
 ```js
 import * as React from "react";
-import anonymous from "@lewisl9029/react-anonymous";
+import Anonymous from "@lewisl9029/react-anonymous";
 
 const Example = () => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -115,45 +123,71 @@ const Example = () => {
     <div>
       {isOpen
         ? // call anonymous anywhere in the tree, without introducing a separate named component
-          anonymous(() => (
-            <Modal
-              close={React.useCallback(() => setIsOpen(false), [setIsOpen])}
-            >
-              Blah
-            </Modal>
-          ))
+          <Anonymous key="true">
+            {() => (
+              <Modal
+                close={React.useCallback(() => setIsOpen(false), [setIsOpen])}
+              >
+                Blah
+              </Modal>
+            )}
+          </Anonymous>
         : null}
     </div>
   );
 };
 ```
 
-The `anonymous` function from `react-anonymous` acts as a component boundary for all of your hook calls. You can add it anywhere inside the render tree to call hooks in a way that would otherwise have violated the rules of hooks, without adding any additional layers of indirection.
+The `Anonymous` component from `react-anonymous` acts as a component boundary for all of your hook calls. You can add it anywhere inside the render tree to call hooks in a way that would otherwise have violated the rules of hooks, without adding any additional layers of indirection.
 
-Note that it also works great for looping:
+The key prop is used to distinguish different branches in cases like the following:
+
+```js
+isOpen
+  ?
+    <Anonymous key="true">
+      {() => {
+        const [state] = useState('open')
+        return state
+      }}
+    </Anonymous>
+  : 
+    <Anonymous key="false">
+      {() => {
+        const [state] = useState('closed')
+        return state
+      }}
+    </Anonymous>
+```
+
+Without the `key`, when `isOpen` changes between renders, React would assume that the same component is being rendered and share the same set of hook calls & state between the two branches. It's not strictly necessary in the original example where we don't render a separate branch, but we recommend providing it anyways in case an alternate branch with an `Anonymous` component is added later. We enforce this if you use TypeScript.
+
+Note that the `Anonymous` component also works great for looping:
 
 ```js
 import * as React from "react";
-import anonymous from "@lewisl9029/react-anonymous";
+import Anonymous from "@lewisl9029/react-anonymous";
 
 const Example = ({ colors }) => {
   return (
     <ul>
       {colors.map((color) =>
-        anonymous(() => (
-          <li style={useMemo(() => ({ color }), [color])}>{color}</li>
-        ))
+        <Anonymous key={color}>
+          {() => (
+            <li style={useMemo(() => ({ color }), [color])}>{color}</li>
+          )}
+        </Anonymous>
       )}
     </ul>
   );
 };
 ```
 
-However, keep in mind that you still have to obey the rules of hooks within the `anonymous` function:
+However, keep in mind that you still have to obey the rules of hooks within the `Anonymous` component's render function:
 
 ```js
 import * as React from "react";
-import anonymous from "@lewisl9029/react-anonymous";
+import Anonymous from "@lewisl9029/react-anonymous";
 
 const Example = ({ colors }) => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -161,29 +195,32 @@ const Example = ({ colors }) => {
   return (
     <div>
       {isOpen
-        ? anonymous(() => (
-            <Modal
-              close={React.useCallback(() => setIsOpen(false), [setIsOpen])}
-            >
-              <ul>
-                {colors.map((color) => (
-                  // This still violates the rule of hooks on looping
-                  <li style={useMemo(() => ({ color }), [color])}>{color}</li>
-                ))}
-              </ul>
-            </Modal>
-          ))
+        ? 
+          <Anonymous key="true">
+            {() => (
+              <Modal
+                close={React.useCallback(() => setIsOpen(false), [setIsOpen])}
+              >
+                <ul>
+                  {colors.map((color) => (
+                    // This still violates the rule of hooks on looping
+                    <li style={useMemo(() => ({ color }), [color])}>{color}</li>
+                  ))}
+                </ul>
+              </Modal>
+            )}
+          </Anonymous>
         : null}
     </div>
   );
 };
 ```
 
-We can, however, nest additional layers of the `anonymous` function to arbitrary depths to work around this:
+We can, however, nest additional layers of `Anonymous` components to arbitrary depths to work around this:
 
 ```js
 import * as React from "react";
-import anonymous from "@lewisl9029/react-anonymous";
+import Anonymous from "@lewisl9029/react-anonymous";
 
 const Example = ({ colors }) => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -191,20 +228,25 @@ const Example = ({ colors }) => {
   return (
     <div>
       {isOpen
-        ? anonymous(() => (
-            <Modal
-              close={React.useCallback(() => setIsOpen(false), [setIsOpen])}
-            >
-              <ul>
-                {colors.map((color) =>
-                  // All good now
-                  anonymous(() => (
-                    <li style={useMemo(() => ({ color }), [color])}>{color}</li>
-                  ))
-                )}
-              </ul>
-            </Modal>
-          ))
+        ? 
+          <Anonymous key="true">
+            {() => (
+              <Modal
+                close={React.useCallback(() => setIsOpen(false), [setIsOpen])}
+              >
+                <ul>
+                  {colors.map((color) =>
+                    <Anonymous key={color}>
+                      {() => (
+                        // All good now
+                        <li style={useMemo(() => ({ color }), [color])}>{color}</li>
+                      )}
+                    </Anonymous>
+                  )}
+                </ul>
+              </Modal>
+            )}
+          </Anonymous>
         : null}
     </div>
   );
@@ -219,7 +261,7 @@ For instance, a [CSS-in-JS hook](https://github.com/lewisl9029/use-styles) where
 
 ```js
 import * as React from "react";
-import anonymous from "@lewisl9029/react-anonymous";
+import Anonymous from "@lewisl9029/react-anonymous";
 import { useStyles } from "@lewisl9029/use-styles";
 
 const Example = ({ colors }) => {
@@ -228,19 +270,24 @@ const Example = ({ colors }) => {
   return (
     <div>
       {isOpen
-        ? anonymous(() => (
-            <Modal
-              close={React.useCallback(() => setIsOpen(false), [setIsOpen])}
-            >
-              <ul className={useStyles(() => ({ listStyleType: 'none' }), [])}>
-                {colors.map((color) =>
-                  anonymous(() => (
-                    <li className={useStyles(() => ({ color }), [color])}>{color}</li>
-                  ))
-                )}
-              </ul>
-            </Modal>
-          ))
+        ? 
+          <Anonymous key="true">
+            {() => (
+              <Modal
+                close={React.useCallback(() => setIsOpen(false), [setIsOpen])}
+              >
+                <ul className={useStyles(() => ({ listStyleType: 'none' }), [])}>
+                  {colors.map((color) =>
+                    <Anonymous key={color}>
+                      {() => (
+                        <li className={useStyles(() => ({ color }), [color])}>{color}</li>
+                      )}
+                    </Anonymous>
+                  )}
+                </ul>
+              </Modal>
+            )}
+          </Anonymous>
         : null}
     </div>
   );
@@ -251,32 +298,35 @@ The anonymous component pattern can help reduce forced indirection in ways beyon
 
 ```js
 import * as React from 'react'
-import anonymous from "@lewisl9029/react-anonymous";
+import Anonymous from "@lewisl9029/react-anonymous";
 
 const themeContext = React.createContext()
 
 const Example = () => {
   return (
     <themeContext.Provider value={{ foreground: 'black', background: 'white' }}>
-      {anonymous(() => {
-        // Calling useContext(themeContext) outside of anonymous would result in undefined.
-        // 
-        // Since only components downstream from the component where the Provider 
-        // is rendered can read from the Provider.
-        const theme = React.useContext(themeContext)
-        return (
-          <span className={
-            useStyles(
-              () => ({ 
-                color: theme.foreground, 
-                backgroundColor: theme.background 
-              }), 
-              [theme.background, theme.background]
-            )}
-          >
-            themed text
-          </span>
-      })}
+      <Anonymous key="true">
+        {() => {
+          // Calling useContext(themeContext) outside of anonymous would result in undefined.
+          // 
+          // Since only components downstream from the component where the Provider 
+          // is rendered can read from the Provider.
+          const theme = React.useContext(themeContext)
+          return (
+            <span className={
+              useStyles(
+                () => ({ 
+                  color: theme.foreground, 
+                  backgroundColor: theme.background 
+                }), 
+                [theme.background, theme.background]
+              )}
+            >
+              themed text
+            </span>
+          )
+        }
+      </Anonymous>
     </themeContext.Provider>
   )
 }
@@ -285,21 +335,20 @@ const Example = () => {
 
 ## Linting
 
-If you're using [eslint-plugin-react-hooks](https://www.npmjs.com/package/eslint-plugin-react-hooks), you'll get errors when trying to use `react-anonymous` due to the plugin not recognizing that `anonymous` can be treated as a valid component boundary.
+If you're using [eslint-plugin-react-hooks](https://www.npmjs.com/package/eslint-plugin-react-hooks), you'll get errors when trying to use `react-anonymous` due to the plugin not recognizing that the `Anonymous` render function can be treated as a valid component boundary.
 
-I've created a fork of the plugin at https://www.npmjs.com/package/@lewisl9029/eslint-plugin-react-hooks to add support for this pattern. The changes are [very naive](https://github.com/lewisl9029/react/pull/1/files) however, so I do anticipate plenty of edge cases. Please feel free to report any issues you find with the plugin here.
+I've created a fork of the plugin at https://www.npmjs.com/package/@lewisl9029/eslint-plugin-react-hooks-for-react-anonymous to add support for this pattern. The changes are [very naive](https://github.com/lewisl9029/react/pull/1) however, so I do anticipate some edge cases. Please feel free to report any issues you find with the plugin here.
 
 ## How it works
 
-The implementation is literally 2 lines:
+The implementation is literally a 1-liner:
 
 ```js
 export const Anonymous = ({ children }) => children();
-export const anonymous = (children) => React.createElement(Anonymous, { children });
 ```
 
-By packaging it as a library I'm mostly trying to promote the pattern and make it easier to get people started using it. Feel free to simply copy paste this into your project and use it directly, replacing the eslint plugin with my fork from above. I hope to eventually document this pattern in an RFC so we can get official support for it in the linting rule without having to maintain a fork.
+By packaging it as a library, I'm mostly aiming to promote the pattern and make it easier for people to get started. Feel free to simply copy paste this into your project and use it directly, replacing the eslint plugin with my fork from above.
 
 ## License
 
-[MIT](https://github.com/lewisl9029/react-anonymous/blob/master/src/LICENSE.txt)
+[MIT](https://github.com/lewisl9029/react-anonymous/blob/main/src/LICENSE.txt)
