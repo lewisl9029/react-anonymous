@@ -7,4 +7,4 @@ export const Anonymous: (props: {
   key: string,
 }) => ReturnType<RenderFunction>
 
-export = Anonymous
+export default Anonymous
