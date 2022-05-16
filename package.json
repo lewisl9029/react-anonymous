@@ -1,6 +1,6 @@
 {
   "name": "@lewisl9029/react-anonymous",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "keywords": [
     "react",
     "hooks",
@@ -20,6 +20,6 @@
     "react": ">16.8.0"
   },
   "optionalDependencies": {
-    "@lewisl9029/eslint-plugin-react-hooks-for-react-anonymous": "0.0.1"
+    "@lewisl9029/eslint-plugin-react-hooks-for-react-anonymous": "^0.0.4"
   }
 }
