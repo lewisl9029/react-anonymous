@@ -1,6 +1,6 @@
 {
   "name": "@lewisl9029/react-anonymous",
-  "version": "5.0.2",
+  "version": "6.0.0",
   "keywords": [
     "react",
     "hooks",
@@ -10,6 +10,13 @@
   ],
   "description": "Rules of hooks made less painful. Use hooks anywhere in your render tree by rendering an `Anonymous` component.",
   "main": "src/index.js",
+  "module": "src/index.js",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    }
+  },
   "types": "src/index.d.ts",
   "type": "module",
   "repository": "https://github.com/lewisl9029/react-anonymous.git",
@@ -17,7 +24,7 @@
   "license": "MIT",
   "private": false,
   "peerDependencies": {
-    "react": ">16.8.0"
+    "react": ">=16.8.0"
   },
   "optionalDependencies": {
     "@lewisl9029/eslint-plugin-react-hooks-for-react-anonymous": "^0.0.4"
